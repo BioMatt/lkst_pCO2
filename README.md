@@ -1,4 +1,4 @@
-# Lake sturgeon *p*CO<sub>2</sub> and temperature
+# An experiment with lake sturgeon, *p*CO<sub>2</sub>, and temperature
 A repository for scripts related to a lake sturgeon *p*CO<sub>2</sub> and temperature exposure-based experiment. The following sections have explanations of repo directories and files.
 
 
