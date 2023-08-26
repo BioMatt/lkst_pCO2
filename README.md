@@ -3,7 +3,7 @@ A repository for scripts related to a lake sturgeon *p*CO<sub>2</sub> and temper
 
 
 ## R_scripts:
-These R scripts are divided into those used for looking at RNAseq data and those used for modeling different physiological variables.
+These R scripts are divided into those used for looking at RNAseq data and those used for modeling different physiological and behavioural variables.
 - `RNAseq`
   - [`edgeR.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/RNAseq/edgeR.R) contains code for running differential gene expression analyses with [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html), making a PCA and heatmap, and writing out results tables.
   - [`enrichR_nonunique.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/RNAseq/enrichR_nonunique.R) contains code for using edgeR results with [enrichR](https://maayanlab.cloud/Enrichr/) to identify gene ontology terms specific, but not unique to each experimental treatment.
