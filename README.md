@@ -4,12 +4,12 @@ A repository for scripts related to a lake sturgeon *p*CO<sub>2</sub> and temper
 
 ## R_scripts:
 These R scripts are divided into those used for looking at RNAseq data and those used for modeling different physiological and behavioural variables.
-- `RNAseq`
+### `RNAseq`
   - [`edgeR.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/RNAseq/edgeR.R) contains code for running differential gene expression analyses with [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html), making a PCA and heatmap, and writing out results tables.
   - [`enrichR_nonunique.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/RNAseq/enrichR_nonunique.R) contains code for using edgeR results with [enrichR](https://maayanlab.cloud/Enrichr/) to identify gene ontology terms specific, but not unique to each experimental treatment.
   - [`enrichR_overall.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/RNAseq/enrichR_overall.R) contains code for using edgeR results with enrichR to identify gene ontology terms unique to each experimental treatment.
 
-- `stats`
+### `stats`
   -  [`Ammonia.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/Ammonia.R) contains brms-based Bayesian analyses of ammonia excretion among the different experimental groups.
   -  [`NKA_corr.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/NKA_corr.R) contains Bayesian models of Na<sup>+</sup>/K<sup>+</sup> ATPase activity and transcript abundance for different subunits.
   -  [`behaviour.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/behaviour.R) contains models of responses to cues at 0 and 24h after a transient increase in *p*CO<sub>2</sub> of 10,000 μatm.
