@@ -12,9 +12,12 @@ These R scripts are divided into those used for looking at RNAseq data and those
 - `stats`
   -  [`Ammonia.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/Ammonia.R) contains brms-based Bayesian analyses of ammonia excretion among the different experimental groups.
   -  [`NKA_corr.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/NKA_corr.R) contains Bayesian models of Na<sup>+</sup>/K<sup>+</sup> ATPase activity and transcript abundance for different subunits.
-  -  [`brms_ATPase.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/brms_ATPase.R) contains Bayesian models of Na<sup>+</sup>/K<sup>+</sup> ATPase activity among different experimental groups.
-  -  [`hematocrit.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/hematocrit.R) contains Bayesian models of hematocrit levels among different groups.
-  -  [`metabolic_rate.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/metabolic_rate.R) contains Bayesian models of routine and maximum metabolic rates among the different groups.
+  -  [`behaviour.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/behaviour.R) contains models of responses to cues at 0 and 24h after a transient increase in *p*CO<sub>2</sub> of 10,000 μatm.
+  -  [`boldness.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/boldness.R) contains models of activity and time near a [novel object](https://static.wikia.nocookie.net/lego/images/2/2e/75370_Stormtrooper.jpg/revision/latest?cb=20230620012257) during the middle 3 minutes of a 5 minute experiment.
+  -  [`brms_ATPase.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/brms_ATPase.R) contains models of Na<sup>+</sup>/K<sup>+</sup> ATPase activity among different experimental groups.
+  -  [`hematocrit.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/hematocrit.R) contains models of hematocrit levels among different groups.
+  -  [`metabolic_rate.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/metabolic_rate.R) contains models of routine and maximum metabolic rates among the different groups.
+  -  [`network_plot.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/network_plot.R) contains visualizations of gene betweenness scores in networks, found using [OmicsNet 2.0](https://www.omicsnet.ca/). 
  
 
 ## shell_scripts:
