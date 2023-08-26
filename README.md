@@ -2,7 +2,7 @@
 A repository for scripts related to a lake sturgeon *p*CO<sub>2</sub> and temperature exposure-based experiment. The following sections have explanations of repo directories and files.
 
 
-## `R_scripts`:
+## R_scripts:
 These R scripts are divided into those used for looking at RNAseq data and those used for modeling different physiological variables.
 - `RNAseq`
   - [`edgeR.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/RNAseq/edgeR.R) contains code for running differential gene expression analyses with [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html), making a PCA and heatmap, and writing out results tables.
@@ -17,7 +17,7 @@ These R scripts are divided into those used for looking at RNAseq data and those
   -  [`metabolic_rate.R`](https://github.com/BioMatt/lkst_pCO2/blob/main/R_scripts/stats/metabolic_rate.R) contains Bayesian models of routine and maximum metabolic rates among the different groups.
  
 
-## `shell_scripts`:
+## shell_scripts:
 These shell scripts were run on the [Cedar](https://docs.alliancecan.ca/wiki/Cedar) cluster of the [Digital Research Alliance of Canada](https://alliancecan.ca/en).
   - [`fastp.sh`](https://github.com/BioMatt/lkst_pCO2/blob/main/shell_scripts/fastp.sh) uses the program [fastp](https://github.com/OpenGene/fastp) to perform quality control on the raw RNAseq data.
   - [`raw_reads.txt`](https://github.com/BioMatt/lkst_pCO2/blob/main/shell_scripts/raw_reads.txt) is not a script, but a text file with explicit file paths to raw data useful for running array jobs. This file can be easily created with a line like `printf '%s\n' "$PWD"/*_R1.fastq.gz > forward_reads.txt` and another for reverse reads, then putting them together.
