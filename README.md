@@ -26,3 +26,7 @@ These shell scripts were run on the [Cedar](https://docs.alliancecan.ca/wiki/Ced
   - [`raw_reads.txt`](https://github.com/BioMatt/lkst_pCO2/blob/main/shell_scripts/raw_reads.txt) is not a script, but a text file with explicit file paths to raw data useful for running array jobs. This file can be easily created with a line like `printf '%s\n' "$PWD"/*_R1.fastq.gz > forward_reads.txt` and another searching for R2 for reverse reads, then putting them together.
   - [`salmon_index.sh`](https://github.com/BioMatt/lkst_pCO2/blob/main/shell_scripts/salmon_index.sh) uses the program [Salmon](https://combine-lab.github.io/salmon/) to index the lake sturgeon gill transcriptome for subsequent transcript quantification.
   - [`salmon_quant.sh`](https://github.com/BioMatt/lkst_pCO2/blob/main/shell_scripts/salmon_quant.sh) uses Salmon to quantify transcript abundance. The output files of this script would then be used with the `edgeR.R` script under the `R_scripts` folder.
+
+
+## Other links:
+Behavioural data can be found on [figshare](https://doi.org/10.6084/m9.figshare.24043269.v1)
