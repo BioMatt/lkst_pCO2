@@ -29,4 +29,4 @@ These shell scripts were run on the [Cedar](https://docs.alliancecan.ca/wiki/Ced
 
 
 ## Other links:
-Behavioural data can be found on [figshare](https://doi.org/10.6084/m9.figshare.24043269.v1)
+Behavioural data can be found on [figshare](https://doi.org/10.6084/m9.figshare.24043269.v1).
