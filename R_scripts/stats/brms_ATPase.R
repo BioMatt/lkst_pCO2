@@ -41,6 +41,17 @@ raw_data_lengthmass <- raw_data_lengthmass %>%
   mutate(Mass_c = Mass - mean(Mass),
          Length_c = Length - mean(Length))
 
+raw_data %>% 
+  group_by(treatment_combined) %>% 
+  tally()
+
+raw_data %>% 
+  distinct(Run) %>% 
+  nrow(.)
+raw_data %>% 
+  group_by(Run) %>% 
+  tally()
+
 # Take a look at the raw data
 ggplot(data = raw_data, aes(x = Time, y = ATPase)) +
   geom_point() +

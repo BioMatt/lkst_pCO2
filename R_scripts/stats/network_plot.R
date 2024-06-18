@@ -2,6 +2,8 @@ library(tidyverse) # Manage data
 library(fishualize) # Nice plot colours
 library(moments) # Calculate skewness
 library(enrichR) # Check for GO terms in network results
+library(ComplexUpset)
+library(patchwork)
 # A function to take an EnrichrR table and split the GO term and definition for input into Revigo
 split_go <- function(x) {
   # Taking apart the GO descriptions and GO ID terms
@@ -111,14 +113,14 @@ ggplot(data = combined_network %>% arrange(desc(Betweenness)) %>% filter(Between
   theme_bw()
 
 # Make a combined skewness plot, inputting the skewness values identified above
-skewness_plot <- ggplot(data = combined_data %>% arrange(dataset, desc(Betweenness)) %>% filter(Betweenness > 0), aes(x = index, y = Betweenness, color = dataset, fill = dataset)) +
+skewness_plot <- ggplot(data = combined_data %>% arrange(dataset, desc(Betweenness)) %>% filter(Betweenness > 0, index < 250), aes(x = index, y = Betweenness, color = dataset, fill = dataset)) +
   geom_point(alpha = 0.9, size= 1.1) +
   scale_fill_fish_d(option = "Lampris_guttatus", direction = 1, labels = c(bquote(italic(p)*CO[2]*"+"*Temp*", 3.40"), bquote(italic(p)*CO[2]*", 4.22"), "Temperature, 5.02")) +
   scale_colour_fish_d(option = "Lampris_guttatus", direction = 1, labels = c(bquote(italic(p)*CO[2]*"+"*Temp*", 3.40"), bquote(italic(p)*CO[2]*", 4.22"), "Temperature, 5.02")) +
   xlab("Gene Index") +
   guides(fill = guide_legend(title="Treatment, Skewness"), colour = guide_legend(title="Treatment, Skewness")) +
   theme_bw(base_size = 18) +
-  theme(legend.position = c(0.80, 0.88), legend.background = element_blank(), legend.key = element_blank())
+  theme(legend.position = c(0.80, 0.75), legend.background = element_blank(), legend.key = element_blank())
 skewness_plot
 ggsave(filename = "skew_plot.pdf", plot = skewness_plot, dpi = 2000)
 
@@ -181,3 +183,54 @@ write_tsv(x = pCO2_enrich_hubs_bio, file = "Network_pCO2_hubs.txt")
 
 write_tsv(x = combined_enrich_spokes_bio, file = "Network_Combined_spokes.txt")
 write_tsv(x = combined_enrich_hubs_bio, file = "Network_Combined_hubs.txt")
+
+
+# Make an upset plot
+# Create an upset plot of the combined and unique term descriptions from the KEGG analysis
+combined_list <- list(Temp = c(combined_data %>% filter(dataset == "temp") %>% column_to_rownames(Label) %>%pull(Label)), pCO2 = c(combined_data %>% filter(dataset == "pCO2") %>% pull(Label)), combined = c(combined_data %>% filter(dataset == "combo") %>% pull(Label)))
+
+# Make a complex upset plot rather than the original version
+upset_plot <- upset(data = UpSetR::fromList(combined_list), intersect = c("Temp", "pCO2", "combined"), labeller=ggplot2::as_labeller(c('Temp' = 'Temperature','pCO2' = "pCO2", 'combined' =  'Combined')), name = bquote("Treatment"), set_sizes=(upset_set_size()+ylab("Number of Transcripts")))
+upset_plot
+
+
+combined_data %>% distinct(Label) %>% nrow(.)
+
+
+# Create a dataframe with presence absense information not using UpSetR's function, so we can add extra information to it. First, calculate betweenness centrality scores for each gene based on mean values if there are multiple, or just one if not
+melted_data <- combined_data %>% 
+  add_column(Present=1) %>% 
+  pivot_wider(names_from=dataset, values_from=Present) %>% 
+  replace(is.na(.), 0) %>% 
+  group_by(Label) %>% 
+  summarize(mean_betweenness = mean(Betweenness))
+
+# Create the presence absence dataframe of genes
+melted_data2 <- combined_data %>% 
+  add_column(Present=1) %>% 
+  pivot_wider(names_from=dataset, values_from=Present) %>% 
+  replace(is.na(.), 0) %>% 
+  group_by(Label) %>% 
+  summarize(pCO2 = sum(pCO2), temp = sum(temp), combo = sum(combo))
+
+# Join the mean betweenness centrality scores to the presence abscense data
+presence_absense_data <- left_join(melted_data, melted_data2, by = "Label")
+
+# Check that the basic upset plot looks the same- it does.
+upset(data = presence_absense_data, intersect = c("temp", "pCO2", "combo"), labeller=ggplot2::as_labeller(c('temp' = 'Temperature','pCO2' = "pCO2", 'combo' =  'Combined')), name = bquote("Treatment"), set_sizes=(upset_set_size()+ylab("Number of Transcripts")), annotations = list('mean_betweenness'=upset_annotate('mean_betweenness', geom_violin(na.rm=TRUE))+ylab(bquote(atop("Mean Betweenness", "Centrality Score")))))
+
+t.test(combined_data %>% filter(dataset == "temp") %>% pull(Betweenness), combined_data %>% filter(dataset == "combo") %>% pull(Betweenness))
+
+ggplot(combined_data, aes(x = dataset, y = Betweenness)) +
+  #geom_point() +
+  geom_boxplot() +
+  theme_bw()
+
+
+upset_plot_networktranscripts <- upset(data = presence_absense_data, intersect = c("temp", "pCO2", "combo"), labeller=ggplot2::as_labeller(c('temp' = 'Temperature','pCO2' = "pCO2", 'combo' =  'Combined')), name = bquote("Treatment"), set_sizes=(upset_set_size()+ylab("Number of Transcripts")))
+ggsave(filename = "upsetplot_network.pdf", plot = upset_plot_networktranscripts, dpi = 3000)
+ggsave(filename = "upsetplot_network.svg", plot = upset_plot_networktranscripts, dpi = 3000)
+
+
+skew_upset_plot <- skewness_plot / upset_plot_networktranscripts
+ggsave(filename = "upsetplot_skew_network.svg", plot = skew_upset_plot, dpi = 3000)

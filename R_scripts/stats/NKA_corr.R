@@ -144,7 +144,7 @@ transcript_IDs <- colnames(nka_atpase)[12:44]
 
 # Create a function that runs a Bayesian model, summarizes it, and identifies R2, and outputs a list
 model_function <- function(gene, dataset){
-  model <- brm(data = dataset, family = gaussian,
+  model <- brm(data = dataset, family = student,
                    bf(paste("Mean_ATPase ~ ", gene)), 
                    prior = c(prior(normal(0, 100), class = b),
                              prior(normal(0, 100), class = Intercept)),
@@ -231,23 +231,46 @@ annotation <- read_tsv("../gill_annotation_bit50_E1e-6.txt") %>%
 model_annotations_combined <- left_join(model_summaries_combined, annotation, by = "Transcript_ID")
 
 
-plot(conditional_effects(NKA_transcript_models$TR74551.c2_g1_i9$model), points = T, theme = theme_bw())
-plot1 <- plot(conditional_effects(NKA_transcript_models$TR74551.c2_g1_i3$model), points = T, theme = theme_bw(base_size = 14))
-best_model_plot <- plot1$TR74551.c2_g1_i3 +
-  xlab("Subunit Beta-1 (TR74551|c2_g1_i3) Counts per Million") +
-  ylab(bquote(Na^"+"*"/"*K^"+"~ATPase~Activity~(nmol~NADH*"\U00B7"*min^-1*"\U00B7"*mg~pr^-1)))
+plot(conditional_effects(NKA_transcript_models$TR74551.c2_g1_i9$model), points = T, theme = theme_bw(base_size = 14))
+
+plot1 <- plot(conditional_effects(NKA_transcript_models$TR70983.c0_g1_i1$model), points = F, theme = theme_bw(base_size = 14))
+
+best_model_plot <- plot1$TR70983.c0_g1 +
+  xlab(bquote(atop("Subunit "*italic(beta)*"3 (TR70983|c0_g1_i1)", "Counts per Million"))) +
+  ylab(bquote(atop(Na^"+"*"/"*K^"+"~ATPase~Activity, (nmol~NADH*"\U00B7"*min^-1*"\U00B7"*mg~pr^-1)))) +
+  geom_point(data = nka_atpase, aes(x = `TR70983.c0_g1_i1`, y = Mean_ATPase, colour = Treatment, shape = factor(Time)), inherit.aes = FALSE) +
+  scale_colour_fish_d(option = "Lampris_guttatus", direction = -1, labels = c(bquote(italic(p)*CO[2]*"+"*Temp), bquote(italic(p)*CO[2]), "Temperature", "Control"), breaks = c("Combo", "pCO2", "Temp", "Control")) +
+  guides(colour = "none", shape = guide_legend("Timepoint")) +
+  theme(legend.background = element_blank(), legend.position = c(.86, 0.76))
+best_model_plot
 
 plot2 <- plot(conditional_effects(NKA_transcript_models$TR45365.c0_g1_i3$model), points = T, theme = theme_bw(base_size = 18))
 plot2$TR45365.c0_g1_i3 +
   xlab("TR45365|c0_g1_i3 Counts per Million") +
   ylab(bquote(Na^"+"*"/"*K^"+"~ATPase~Activity~(nmol~NADH*"\U00B7"*min^-1*"\U00B7"*mg~pr^-1)))
+  
 
 plot(conditional_effects(NKA_transcript_models$TR85165.c0_g1_i1$model), points = T, theme = theme_bw())
 
 # Add a new column with shortened subunit names for nicer plotting
 model_annotations_combined <- model_annotations_combined %>% 
   separate(sp.BX_transcript_name, sep = " ", into = c("Sodium", "ATPase", "foo", "subunit"), remove = FALSE) %>% 
-  select(-Sodium, -ATPase, -foo)
+  select(-Sodium, -ATPase, -foo)  %>% 
+  separate(subunit, into = c("subunit_overall", "number"), sep = "-", remove = FALSE) %>% 
+  select(-number)
+
+
+ggplot(model_annotations_combined, aes(y = Transcript.Estimate, x = subunit, ymin = `Transcript.l-95% CI`, ymax = `Transcript.u-95% CI`)) +
+  geom_pointrange(position=position_dodge2(width=0.70)) +
+  ylim(-50, 50) +
+  theme_bw()
+
+
+ggplot(model_annotations_combined, aes(y = Transcript.Estimate, x = elpd_loo, color = subunit)) +
+  geom_point() +
+  theme_bw()
+
+
 
 subunit_R2_plot <- ggplot(model_annotations_combined, aes(x = subunit, y = R2)) +
   geom_violin() +
@@ -271,6 +294,28 @@ subunit_loo_plot <- ggplot(model_annotations_combined, aes(x = subunit, y = elpd
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 subunit_loo_plot
 ggsave(filename = "NKA_subunit_loo.pdf", plot = subunit_loo_plot, dpi = 2000)
+
+
+subunit_loo_plot_simplified <- ggplot(model_annotations_combined, aes(x = subunit_overall, y = elpd_loo)) +
+  geom_boxplot(outliers = FALSE) +
+  ggbeeswarm::geom_beeswarm() +
+  #geom_errorbar(aes(ymin = elpd_loo - loo.se, ymax = elpd_loo + loo.se)) +
+  ylab("ELPD LOO") +
+  xlab(bquote(Na^"+"*"/"*K^"+"~ATPase~Subunit)) +
+  scale_x_discrete(labels = c(bquote(alpha), bquote(beta))) +
+  theme_bw(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+subunit_loo_plot_simplified
+
+model_annotations_combined %>% filter(subunit_overall == "alpha") %>% pull(elpd_loo) %>% mean(.)
+model_annotations_combined %>% filter(subunit_overall == "beta") %>% pull(elpd_loo) %>% mean(.)
+
+model_annotations_combined %>% filter(subunit_overall == "alpha") %>% pull(elpd_loo) %>% mean(.)
+model_annotations_combined %>% filter(subunit_overall == "beta") %>% pull(elpd_loo) %>% mean(.)
+
+model_annotations_combined %>% 
+  group_by(subunit_overall) %>% 
+  summarize(mean_loo = mean(Transcript.Estimate))
 
 
 write_tsv(x = model_annotations_combined, file = "NKA_mRNA_activity_models.txt")
@@ -332,16 +377,34 @@ load(file = "atpase_plot.RData")
 atpase_plot <- ggplot(data = atpase_emmeansdraws, aes(x = .value, y = time, fill = treatment, colour = treatment)) +
   stat_halfeye(orientation = "horizontal", alpha = 0.5) +
   #geom_point(data = raw_data, aes(x = ATPase, y = Time, fill = Treatment, colour = Treatment), alpha = 0.5, shape = 15) +
-  scale_fill_fish_d(option = "Lampris_guttatus", direction = -1, labels = c(bquote(italic(p)*CO[2]*"+"*Temp), bquote(italic(p)*CO[2]), "Temperature", "Control")) +
-  scale_colour_fish_d(option = "Lampris_guttatus", direction = -1, labels = c(bquote(italic(p)*CO[2]*"+"*Temp), bquote(italic(p)*CO[2]), "Temperature", "Control")) +
+  scale_fill_fish_d(option = "Lampris_guttatus", direction = -1, labels = c(bquote(italic(p)*CO[2]*"+"*Temp), bquote(italic(p)*CO[2]), "Temperature", "Control"), breaks = c("Combo", "pCO2", "Temp", "Control")) +
+  scale_colour_fish_d(option = "Lampris_guttatus", direction = -1, labels = c(bquote(italic(p)*CO[2]*"+"*Temp), bquote(italic(p)*CO[2]), "Temperature", "Control"), breaks = c("Combo", "pCO2", "Temp", "Control")) +
   xlab(bquote(Na^"+"*"/"*K^"+"~ATPase~Activity~(nmol~NADH*"\U00B7"*min^-1*"\U00B7"*mg~pr^-1))) +
   ylab("Timepoint (hours)") +
   guides(fill = guide_legend(title="Treatment"), colour = guide_legend(title="Treatment")) +
   xlim(4, 42) +
   theme_bw(base_size = 20) +
-  theme(legend.position = c(0.88, 0.245), legend.background = element_blank())
+  theme(legend.position = c(0.92, 0.30), legend.background = element_blank(), legend.text=element_text(size=12))
 atpase_plot
 # Make a combined plot of the different ATPase activity and transcript models. The activity over time and ELPD Loo plots are likely the most important, while the particular subunit plot was chosen for its lowest LOO and highest R^2 value
-combined_atpase <- atpase_plot / (best_model_plot | subunit_loo_plot) + plot_annotation(tag_levels = 'A')
+combined_atpase <- atpase_plot / (best_model_plot | subunit_loo_plot_simplified) + plot_annotation(tag_levels = 'A')
 
-ggsave(filename = "combined_ATPase_models.pdf", plot = combined_atpase, dpi = 3000, scale = 1.75)
+ggsave(filename = "combined_ATPase_models.pdf", plot = combined_atpase, dpi = 3000, scale = 2)
+
+
+###################################################################
+# Test the TR74551|c2_g1_i3 model without the final 2 datapoints
+# The student distribution was more robust to outliers
+subunit_B1_outlier <- brm(data = nka_atpase, family = student,
+             bf(Mean_ATPase ~ TR74551.c2_g1_i3), 
+             prior = c(prior(normal(0, 100), class = b),
+                       prior(normal(0, 100), class = Intercept)),
+             iter = 20000, warmup = 5000, chains = 4, cores = 4,  
+             control = list(adapt_delta = 0.98, max_treedepth = 12), 
+             save_pars = save_pars(all = TRUE))
+
+summary(subunit_B1_outlier)
+plot(conditional_effects(subunit_B1_outlier), points = T, theme = theme_bw(base_size = 18)) +
+  ylab(bquote(Na^"+"*"/"*K^"+"~ATPase~Activity~(nmol~NADH*"\U00B7"*min^-1*"\U00B7"*mg~pr^-1))) +
+  xlab("TR45365|c0_g1_i3 Counts per Million")
+
