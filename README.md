@@ -1,5 +1,5 @@
 # An experiment with lake sturgeon, *p*CO<sub>2</sub>, and temperature
-A repository for scripts related to a lake sturgeon *p*CO<sub>2</sub> and temperature exposure-based experiment. The following sections have explanations of repo directories and files. These data are now published in _Molecular Ecology_: https://doi.org/10.1111/mec.17432
+A repository for scripts related to a lake sturgeon *p*CO<sub>2</sub> and temperature exposure-based experiment. The following sections have explanations of repo directories and files. These analyses are now published in _Molecular Ecology_: https://doi.org/10.1111/mec.17432
 
 
 ## R_scripts:
